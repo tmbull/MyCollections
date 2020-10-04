@@ -71,44 +71,59 @@ namespace MyCollections
             Count++;
         }
         
-        public T RemoveAtIndex(ref int index) {
-            int idx = 0;
-            var current = _head;
-            while (idx < index && current?.Next != null) {
-                current = current.Next;
-                idx++; // 1 // 2
-            }
-        
-            _head = current?.Next;
-            if (current != null)
+        public T RemoveAtIndex(int index) {
+            if (_head == null || index >= Count)
             {
-                current.Next = null;
-                Count--;
-                return current.Value;
+                throw new ArgumentOutOfRangeException($"{index} is out of range.");
             }
             
-            throw new ArgumentOutOfRangeException($"{index} is out of range.");
+            if (index == 0)
+            {
+                var val = _head.Value;
+                _head = _head.Next;
+                Count--;
+                return val;
+            }
+            
+            var idx = 1;
+            var current = _head;
+            while (idx < index) {
+                current = current.Next ?? throw new ArgumentOutOfRangeException($"{index} is out of range.");
+                idx++;
+            }
+
+            var next = current.Next ?? throw new Exception("This should not be possible.");
+            current.Next = next.Next;
+            Count--;
+            return next.Value;
         }
         
-        public void RemoveAtIndexFromEnd(ref int index) {
-            var count = 1;
+        public void RemoveAtIndexFromEnd(int index) {
             if (_head == null)
             {
                 throw new ArgumentOutOfRangeException($"{index} is out of range."); 
             }
+            if (index == Count - 1)
+            {
+                _head = _head.Next;
+                Count--;
+                return;
+            }
+            
+            var count = 1;
             RemoveRecursive(_head, index, ref count);
-            Count--;
         }
     
-        private static void RemoveRecursive(Node head, int n, ref int count) {
+        private void RemoveRecursive(Node head, int n, ref int count) {
             var currentIdx = count;
             if (head.Next != null) {
                 count++;
                 RemoveRecursive(head.Next, n, ref count);
             }
         
-            if (currentIdx == count - n) {
+            if (currentIdx == count - n - 1) {
                 head.Next = head.Next?.Next;
+                Count--;
             }
         }
 
